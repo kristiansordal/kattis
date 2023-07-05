@@ -1,6 +1,32 @@
+from math import atan2, sqrt
+
+
+def side(a, b, c):
+    x = (b[0] - a[0]) * (c[1] - a[1])
+    y = (b[1] - a[1]) * (c[0] - a[0])
+
+    if x > y:
+        return 1
+    elif x == y:
+        return 0
+    else:
+        return -1
+
+
+def toPolar(points):
+    pointsAngle = []
+    for p in points:
+        phi = atan2(p[1], p[0])
+        r = sqrt(p[0] ** 2 + p[1] ** 2)
+        pointsAngle.append((p, (phi, r)))
+
+    return pointsAngle
+
+
 def checkPoints(points, polygon):
     for p in points:
         lines = set()
+        onPoint = False
         for i in range(0, len(polygon)):
             if i == len(polygon) - 1:
                 p1 = min(polygon[i], polygon[0])
@@ -12,12 +38,12 @@ def checkPoints(points, polygon):
             # print(f"P: {p}")
             # print(f"P1: {p1}")
             # print(f"P2: {p2}")
-            a = 0
+            # a = 0
 
-            if p2[0] - p1[0] > 0:
-                a = (p2[1] - p1[1]) / (p2[0] - p1[0])
+            # if p2[0] - p1[0] > 0:
+            #     a = (p2[1] - p1[1]) / (p2[0] - p1[0])
 
-            b = p1[0]
+            # b = p1[0]
             # print(f"y = {a}x + {b}")
 
             # y = ax + b
@@ -28,11 +54,10 @@ def checkPoints(points, polygon):
             # else:
             #     print((p[1] - b))
             # print(p[0])
-            if a == 0 or p[0] <= (p[1] - b) / a:
-                if p1[1] > p[1] and p2[1] < p[1]:
-                    lines.add(p1)
-                elif p1[1] < p[1] and p2[1] > p[1]:
-                    lines.add(p2)
+            if p1[1] > p[1] and p2[1] < p[1]:
+                lines.add(p1)
+            elif p1[1] < p[1] and p2[1] > p[1]:
+                lines.add(p2)
 
         if len(lines) % 2 == 0:
             print("out")
