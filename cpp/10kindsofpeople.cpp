@@ -5,8 +5,8 @@ struct Coordinate {
     int x;
     int y;
 
-    bool operator==(const Coordinate& a) { return x == a.x && y == a.y; }
-    bool operator>(const Coordinate& o) const {
+    bool operator==(const Coordinate &a) { return x == a.x && y == a.y; }
+    bool operator>(const Coordinate &o) const {
         if (x != o.x) {
             return x < o.x;
         } else {
@@ -25,27 +25,23 @@ struct Coordinate {
     Coordinate(int x, int y) : x(x), y(y){};
 };
 
-const vector<Coordinate> neighbours = {Coordinate(1, 0), Coordinate(0, 1),
-                                       Coordinate(-1, 0), Coordinate(0, -1)};
+const vector<Coordinate> neighbours = {Coordinate(1, 0), Coordinate(0, 1), Coordinate(-1, 0), Coordinate(0, -1)};
 
-vector<Coordinate> getNeighbours(const vector<string>& world,
-                                 const Coordinate& node, bool mode) {
+vector<Coordinate> getNeighbours(const vector<string> &world, const Coordinate &node, bool mode) {
     vector<Coordinate> ns;
     if (mode) {
-        for (const auto& n : neighbours) {
+        for (const auto &n : neighbours) {
             int y = node.x + n.x;
             int x = node.y + n.y;
-            if (x >= 0 && x < world[0].size() && y >= 0 && y < world.size() &&
-                world[y][x] == '0') {
+            if (x >= 0 && x < world[0].size() && y >= 0 && y < world.size() && world[y][x] == '0') {
                 ns.push_back(Coordinate(x, y));
             }
         }
     } else {
-        for (const auto& n : neighbours) {
+        for (const auto &n : neighbours) {
             int y = node.x + n.x;
             int x = node.y + n.y;
-            if (x >= 0 && x < world[0].size() && y >= 0 && y < world.size() &&
-                world[y][x] == '1') {
+            if (x >= 0 && x < world[0].size() && y >= 0 && y < world.size() && world[y][x] == '1') {
                 ns.emplace_back(Coordinate(x, y));
             }
         }
@@ -53,12 +49,9 @@ vector<Coordinate> getNeighbours(const vector<string>& world,
     return ns;
 }
 
-int manhattan(const Coordinate& a, const Coordinate& b) {
-    return abs(a.x - b.x) + abs(a.y - b.y);
-}
+int manhattan(const Coordinate &a, const Coordinate &b) { return abs(a.x - b.x) + abs(a.y - b.y); }
 
-string dijkstra(const vector<string>& world, const Coordinate& root,
-                const Coordinate& goal, bool mode) {
+string dijkstra(const vector<string> &world, const Coordinate &root, const Coordinate &goal, bool mode) {
     // if binary and start is 1
     if (mode && world[root.x][root.y] == '1') {
         return "";
@@ -73,9 +66,7 @@ string dijkstra(const vector<string>& world, const Coordinate& root,
         return "";
     }
 
-    auto comp = [goal](const Coordinate& a, const Coordinate& b) {
-        return (manhattan(a, goal) >= manhattan(b, goal));
-    };
+    auto comp = [goal](const Coordinate &a, const Coordinate &b) { return (manhattan(a, goal) >= manhattan(b, goal)); };
     priority_queue<Coordinate, vector<Coordinate>, decltype(comp)> q(comp);
     set<Coordinate> found;
     found.emplace(root);
@@ -93,7 +84,7 @@ string dijkstra(const vector<string>& world, const Coordinate& root,
             }
         }
 
-        for (const auto& n : getNeighbours(world, curr, mode)) {
+        for (const auto &n : getNeighbours(world, curr, mode)) {
             if (found.find(n) == found.end()) {
                 found.emplace(n);
                 q.push(n);

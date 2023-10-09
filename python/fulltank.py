@@ -1,11 +1,13 @@
 from heapq import heappop, heappush
+import sys
 from math import inf
 
 
 class Node:
-    def __init__(self, id, weight):
+    def __init__(self, id, weight, fuel):
         self.id = id
         self.weight = weight
+        self.fuel = fuel
 
     def __lt__(self, obj):
         return self.weight < obj.weight
@@ -40,7 +42,7 @@ class WeightedGraph:
         return self.vertices
 
 
-def dijkstra(g, root, goal):
+def dijkstra(g, root, goal, prices, capacity):
     q = []
     prev = {}
     dist = {}
@@ -50,28 +52,39 @@ def dijkstra(g, root, goal):
 
     for v in g.getNodes():
         if v != root:
-            heappush(q, Node(v, inf))
+            heappush(q, Node(v, inf, -1))
             prev[v] = None
             dist[v] = inf
 
-    heappush(q, Node(root, 0))
+    heappush(q, Node(root, 0, 20))
+    fuel = capacity
 
     while q:
         curr = heappop(q)
         seen.add(curr.id)
 
-        if goal in seen:
-            return prev
+        # if goal in seen:
+        #     return dist
 
         for n in g.getNeighbours(curr.id):
-            d = curr.weight + g.getWeight(curr.id, n)
+            weight = g.getWeight(curr.id, n)
 
-            if d < dist[n]:
-                dist[n] = d
-                prev[n] = curr.id
-                heappush(q, Node(n, d))
+            # check if we can go along this road
+            if weight <= capacity:
+                # check if we can go with the fuel we have
+                if weight <= fuel:
+                    d = curr.weight + weight * prices[n]
 
-    return prev
+                    if d < dist[n]:
+                        dist[n] = d
+                        prev[n] = curr.id
+                        heappush(q, Node(n, d))
+                else:
+                    fuel = capacity
+
+                    dist[curr.id] = dist[curr.id] + (capacity - fuel) * prices[curr.id]
+
+    return dist
 
 
 def getPath(path, root, goal):
@@ -88,19 +101,23 @@ def getPath(path, root, goal):
 def main():
     g = WeightedGraph()
 
-    for i in range(10):
-        g.addNode(i)
+    _, m = map(int, input().split())
 
-    g.addEdge(0, 1, 10)
-    g.addEdge(0, 2, 5)
-    g.addEdge(0, 3, 5)
-    g.addEdge(2, 4, 1)
-    g.addEdge(3, 4, 2)
+    prices = list(map(int, sys.stdin.readline().split()))
+    print(prices)
 
-    path = dijkstra(g, 0, 4)
-    p = getPath(path, 4, 0)
+    for _ in range(m):
+        x, y, z = map(int, input().split())
+        g.addNode(x)
+        g.addNode(y)
+        g.addEdge(x, y, z)
 
-    print(p)
+    queries = int(input())
+
+    for _ in range(queries):
+        capacity, y, z = map(int, input().split())
+        p = dijkstra(g, y, z, prices, capacity)
+        print(p[z])
 
 
 if __name__ == "__main__":

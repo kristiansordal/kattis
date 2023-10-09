@@ -8,6 +8,7 @@ struct Estimate {
     Estimate() : tickets(0), price(0){};
 };
 
+void pricing(std::vector<Estimate> estimates) {}
 int main() {
     int n, w;
     cin >> n >> w;
@@ -21,15 +22,13 @@ int main() {
             cin >> x;
             estimates.push_back(Estimate(x));
         }
+
         for (int i = 0; i < k; i++) {
             int x;
             cin >> x;
             estimates[w].tickets = x;
         }
     }
-    // for (int i = 0; i <= w; i++) {
-    // }
-    // reverse(estimates.begin(), estimates.end());
 
     for (int i = 0; i < w; i++) {
         cout << estimates[w].price << endl;
