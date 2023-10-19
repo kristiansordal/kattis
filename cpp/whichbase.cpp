@@ -15,21 +15,21 @@ string hexal(double n) {
 int main() {
     int n;
     cin >> n;
-    std::vector<std::pair<int, double>> tests;
+    // std::vector<std::pair<int, double>> tests;
 
-    for (int i = 0; i < n; i++) {
-        std::vector<int> r;
-        int s;
-        double n;
-        cin >> s >> n;
-        tests.push_back(make_pair(s, n));
-    }
+    // for (int i = 0; i < n; i++) {
+    //     std::vector<int> r;
+    //     int s;
+    //     double n;
+    //     cin >> s >> n;
+    //     tests.push_back(make_pair(s, n));
+    // }
 
-    for (auto &t : tests) {
-        std::cout << t.first << " ";
-        std::cout << octal(t.second) << " ";
-        std::cout << t.second << " ";
-        std::cout << hexal(t.second) << std::endl;
-    }
-    return 0;
+    // for (auto &t : tests) {
+    //     std::cout << t.first << " ";
+    //     std::cout << octal(t.second) << " ";
+    //     std::cout << t.second << " ";
+    //     std::cout << hexal(t.second) << std::endl;
+    // }
+    // return 0;
 }
