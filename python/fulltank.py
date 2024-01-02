@@ -1,123 +1,72 @@
-from heapq import heappop, heappush
-import sys
-from math import inf
-
-
-class Node:
-    def __init__(self, id, weight, fuel):
-        self.id = id
-        self.weight = weight
-        self.fuel = fuel
-
-    def __lt__(self, obj):
-        return self.weight < obj.weight
+# fmt: off
+from collections import defaultdict
+from heapq import heappush, heappop
 
 
 class WeightedGraph:
-    def __init__(self):
-        self.vertices = set()
-        self.adj = {}
-        self.weights = {}
-        self.size = 0
+    def __init__(self, vertices, edges):
+        self.n = vertices
+        self.m = edges
+        self.adj = [[0 for _ in range(self.n)] for _ in range(self.n)]
 
-    def addNode(self, v):
-        if v not in self.adj:
-            self.adj[v] = set()
-            self.vertices.add(v)
-            self.size += 1
+    def add_edge(self, u, v, w):
+        self.adj[u][v] = w
 
-    def addEdge(self, a, b, weight):
-        self.adj[a].add(b)
-        self.adj[b].add(a)
-        self.weights[(a, b)] = weight
-        self.weights[(b, a)] = weight
+    def remove_edge(self, u, v):
+        self.adj[u][v] = 0
 
-    def getWeight(self, u, v):
-        return self.weights[(u, v)]
+    def get_weight(self, u, v):
+        return self.adj[u][v]
 
-    def getNeighbours(self, v):
-        return self.adj[v]
-
-    def getNodes(self):
-        return self.vertices
+    def get_neighbours(self, v):
+        return [i for i in range(self.n) if self.adj[v][i] != 0]
 
 
-def dijkstra(g, root, goal, prices, capacity):
-    q = []
-    prev = {}
-    dist = {}
+def dijkstra(g, s, e, cap, fuel):
     seen = set()
-    prev[root] = root
-    dist[root] = 0
-
-    for v in g.getNodes():
-        if v != root:
-            heappush(q, Node(v, inf, -1))
-            prev[v] = None
-            dist[v] = inf
-
-    heappush(q, Node(root, 0, 20))
-    fuel = capacity
+    dist = defaultdict(lambda: 2**32)
+    q = [(fuel[s], s)]
+    dist[s] = 0
 
     while q:
-        curr = heappop(q)
-        seen.add(curr.id)
+        f, u = heappop(q)
 
-        # if goal in seen:
-        #     return dist
+        if u in seen: continue
+        if u == e: return dist[u]
 
-        for n in g.getNeighbours(curr.id):
-            weight = g.getWeight(curr.id, n)
+        seen.add(u)
 
-            # check if we can go along this road
-            if weight <= capacity:
-                # check if we can go with the fuel we have
-                if weight <= fuel:
-                    d = curr.weight + weight * prices[n]
+        for v in g.get_neighbours(u):
+            consumed_fuel = g.get_weight(u, v)
+            if min(cap, f + fuel[v]) - consumed_fuel < 0: continue
+            if dist[v] > dist[u] + consumed_fuel:
+                f -= consumed_fuel
+                dist[v] = dist[u] + consumed_fuel
+                heappush(q, (min(cap, f + fuel[v]), v))
+                # q.cappend((f - consumed_fuel, v))
+    return None
 
-                    if d < dist[n]:
-                        dist[n] = d
-                        prev[n] = curr.id
-                        heappush(q, Node(n, d))
-                else:
-                    fuel = capacity
-
-                    dist[curr.id] = dist[curr.id] + (capacity - fuel) * prices[curr.id]
-
-    return dist
-
-
-def getPath(path, root, goal):
-    p = []
-    p.append(root)
-
-    while root != goal:
-        p.append(path[root])
-        root = path[root]
-
-    return " -> ".join(map(str, reversed(p)))
 
 
 def main():
-    g = WeightedGraph()
-
-    _, m = map(int, input().split())
-
-    prices = list(map(int, sys.stdin.readline().split()))
-    print(prices)
+    n, m = map(int, input().split())
+    g = WeightedGraph(n, m)
+    fuel_prices = [*map(int, input().split())]
 
     for _ in range(m):
-        x, y, z = map(int, input().split())
-        g.addNode(x)
-        g.addNode(y)
-        g.addEdge(x, y, z)
+        u, v, w = map(int, input().split())
+        g.add_edge(u, v, w)
 
-    queries = int(input())
+    q = int(input())
+    dests = []
+    for _ in range(q):
+        dests.append([*map(int, input().split())])
 
-    for _ in range(queries):
-        capacity, y, z = map(int, input().split())
-        p = dijkstra(g, y, z, prices, capacity)
-        print(p[z])
+    for f,s,e in dests:
+        # print(s,e,f)
+        ans = dijkstra(g,s,e,f,fuel_prices)
+        print(ans)
+
 
 
 if __name__ == "__main__":

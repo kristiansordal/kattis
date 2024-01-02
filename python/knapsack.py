@@ -35,9 +35,7 @@ def generate_random_knapsack_instance(num_items, max_value, max_weight, capacity
     values = [random.randint(1, max_value) for _ in range(num_items)]
     weights = [random.randint(1, max_weight) for _ in range(num_items)]
 
-    return f"{num_items} {capacity}\n" + "\n".join(
-        [f"{v} {w}" for v, w in zip(values, weights)]
-    )
+    return f"{num_items} {capacity}\n" + "\n".join([f"{v} {w}" for v, w in zip(values, weights)])
 
 
 def knapsack(v, w, W):
