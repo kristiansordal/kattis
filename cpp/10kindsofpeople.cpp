@@ -1,139 +1,97 @@
 #include <bits/stdc++.h>
+#include <sstream>
+
 using namespace std;
 
-struct Coordinate {
-    int x;
-    int y;
-
-    bool operator==(const Coordinate &a) { return x == a.x && y == a.y; }
-    bool operator>(const Coordinate &o) const {
-        if (x != o.x) {
-            return x < o.x;
-        } else {
-            return y < o.y;
-        }
+bool bfs(vector<vector<int>> &grid, vector<vector<int>> &colors, int color, int r1, int c1, int r2, int c2, int type) {
+    if (type != grid[r1][c1]) {
+        return false;
     }
-    // bool operator>(const Coordinate& lhs, const Coordinate& rhs) const {
-    //     if (rhs.x > lhs.x) {
-    //         return true;
-    //     } else {
-    //         return lhs.y < rhs.y;
-    //     }
-    // }
-    // bool operator>(const Coordinate& a) {return}
 
-    Coordinate(int x, int y) : x(x), y(y){};
-};
+    if (colors[r1][c1] != 0 && colors[r2][c2] != 0) {
+        return colors[r1][c1] == colors[r2][c2];
+    }
 
-const vector<Coordinate> neighbours = {Coordinate(1, 0), Coordinate(0, 1), Coordinate(-1, 0), Coordinate(0, -1)};
+    deque<pair<int, int>> q;
+    bool found = false;
+    vector<vector<bool>> visited(grid.size(), vector<bool>(grid[0].size(), false));
+    vector<pair<int, int>> dirs = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
-vector<Coordinate> getNeighbours(const vector<string> &world, const Coordinate &node, bool mode) {
-    vector<Coordinate> ns;
-    if (mode) {
-        for (const auto &n : neighbours) {
-            int y = node.x + n.x;
-            int x = node.y + n.y;
-            if (x >= 0 && x < world[0].size() && y >= 0 && y < world.size() && world[y][x] == '0') {
-                ns.push_back(Coordinate(x, y));
-            }
+    q.push_back({r1, c1});
+    visited[r1][c1] = true;
+
+    while (q.size() > 0) {
+        auto c = q.back();
+
+        if (colors[c.first][c.second] == 0) {
+            colors[c.first][c.second] = color + type;
         }
-    } else {
-        for (const auto &n : neighbours) {
-            int y = node.x + n.x;
-            int x = node.y + n.y;
-            if (x >= 0 && x < world[0].size() && y >= 0 && y < world.size() && world[y][x] == '1') {
-                ns.emplace_back(Coordinate(x, y));
+
+        q.pop_back();
+
+        if (c.first == r2 && c.second == c2) {
+            found = true;
+        }
+
+        for (auto d : dirs) {
+            int x = c.first + d.first;
+            int y = c.second + d.second;
+
+            if (x >= 0 && x < grid.size() && y >= 0 && y < grid[0].size() && !visited[x][y] &&
+                !(grid[x][y] ^ grid[r1][c1])) {
+                q.push_back({x, y});
+                visited[x][y] = true;
             }
         }
     }
-    return ns;
-}
-
-int manhattan(const Coordinate &a, const Coordinate &b) { return abs(a.x - b.x) + abs(a.y - b.y); }
-
-string dijkstra(const vector<string> &world, const Coordinate &root, const Coordinate &goal, bool mode) {
-    // if binary and start is 1
-    if (mode && world[root.x][root.y] == '1') {
-        return "";
-        // if binary and goal is 1
-    } else if (mode && world[goal.x][goal.y] == '1') {
-        return "";
-        // if decimal and start is 0
-    } else if ((!mode) && world[root.x][root.y] == '0') {
-        return "";
-        // if decimal and goal is 0
-    } else if (!mode && world[goal.x][goal.y] == '0') {
-        return "";
-    }
-
-    auto comp = [goal](const Coordinate &a, const Coordinate &b) { return (manhattan(a, goal) >= manhattan(b, goal)); };
-    priority_queue<Coordinate, vector<Coordinate>, decltype(comp)> q(comp);
-    set<Coordinate> found;
-    found.emplace(root);
-    q.push(root);
-
-    while (!q.empty()) {
-        Coordinate curr = q.top();
-        q.pop();
-
-        if (curr == goal) {
-            if (mode) {
-                return "binary";
-            } else {
-                return "decimal";
-            }
-        }
-
-        for (const auto &n : getNeighbours(world, curr, mode)) {
-            if (found.find(n) == found.end()) {
-                found.emplace(n);
-                q.push(n);
-            }
-        }
-    }
-    return "";
+    return found;
 }
 int main() {
-    // use dijkstrsa
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int r, c;
+    int r, c, n, r1, c1, r2, c2;
+    vector<vector<int>> grid;
+    vector<vector<int>> colors;
 
     cin >> r >> c;
+    colors.assign(r, vector<int>(c, 0));
+    grid.assign(r, vector<int>());
 
-    vector<string> world;
-    world.reserve(r);
     for (int i = 0; i < r; i++) {
         string s;
         cin >> s;
 
-        world.push_back(s);
-    }
-
-    int q;
-    cin >> q;
-
-    for (int i = 0; i < q; i++) {
-        int x1, y1, x2, y2;
-
-        cin >> y1 >> x1 >> y2 >> x2;
-
-        Coordinate start(x1, y1);
-        Coordinate goal(x2, y2);
-
-        // binary people can move on 0s
-        // decimal people can move on 1s
-        string bin = dijkstra(world, start, goal, true);
-        string dec = dijkstra(world, start, goal, false);
-
-        if (bin == "" && dec == "") {
-            cout << "neither"
-                 << "\n";
-        } else if (bin == "") {
-            cout << dec << "\n";
-        } else if (dec == "") {
-            cout << bin << "\n";
+        for (auto &j : s) {
+            grid[i].push_back(j - '0');
         }
     }
+
+    cin >> n;
+
+    for (int i = 0; i < n; i++) {
+        cin >> r1 >> c1 >> r2 >> c2;
+
+        r1--;
+        c1--;
+        r2--;
+        c2--;
+
+        if (grid[r1][c1] != grid[r2][c2]) {
+            cout << "neither" << endl;
+            continue;
+        }
+
+        bool bin = bfs(grid, colors, i * 2, r1, c1, r2, c2, 0);
+        bool dec = bfs(grid, colors, i * 2, r1, c1, r2, c2, 1);
+
+        if (bin) {
+            cout << "binary" << endl;
+        } else if (dec) {
+            cout << "decimal" << endl;
+        } else {
+            cout << "neither" << endl;
+        }
+    }
+
     return 0;
 }

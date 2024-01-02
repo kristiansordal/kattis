@@ -6,7 +6,9 @@ template <typename T> struct Node {
     T parent;
     T node;
 
-    Node() : parent(T()), node(T()){};
+    Node()
+        : parent(T()),
+          node(T()){};
     Node(T _parent, T _node) {
         parent = _parent;
         node = _node;
@@ -52,7 +54,6 @@ template <typename T> class UnionFind {
             components[y].parent = x;
             rank[x]++;
         }
-        // components[y] = Node<T>(x, y);
     }
 };
 

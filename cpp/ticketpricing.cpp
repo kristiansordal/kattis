@@ -1,38 +1,38 @@
 #include <bits/stdc++.h>
 using namespace std;
 struct Estimate {
-    int tickets;
-    int price;
-    Estimate(int t, int p) : tickets(t), price(p){};
-    Estimate(int t) : tickets(t), price(0){};
-    Estimate() : tickets(0), price(0){};
-};
+    int ticket_price;
+    int tickets_sold;
 
-void pricing(std::vector<Estimate> estimates) {}
+    Estimate(int ticket_price, int tickets_sold)
+        : ticket_price(ticket_price),
+          tickets_sold(tickets_sold) {}
+
+    Estimate() = default;
+};
 int main() {
+    // n is number of seats left, w is weeks left
     int n, w;
     cin >> n >> w;
-    vector<Estimate> estimates(w + 1);
 
-    for (int i = 0; i <= w; i++) {
-        int k;
-        cin >> k;
-        for (int i = 0; i < k; i++) {
-            int x;
-            cin >> x;
-            estimates.push_back(Estimate(x));
-        }
+    vector<Estimate> estimates;
+    vector<int> tickets;
+    vector<int> prices;
 
-        for (int i = 0; i < k; i++) {
-            int x;
-            cin >> x;
-            estimates[w].tickets = x;
-        }
+    int k;
+    cin >> k;
+
+    for (int i = 0; i < k; i++) {
+        int p;
+        cin >> p;
+    }
+    for (int i = 0; i < k; i++) {
+        int s;
+        cin >> s;
     }
 
-    for (int i = 0; i < w; i++) {
-        cout << estimates[w].price << endl;
-        cout << estimates[w].tickets << endl;
+    for (int i = 0; i < k; i++) {
+        estimates.push_back()
     }
 
     return 0;
